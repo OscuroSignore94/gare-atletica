@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Ricerca Gare per Specialità</title>
+    <title>Ricerca Gare Atletica</title>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
         input { padding: 10px; width: 100%; margin-bottom: 20px; font-size: 16px; }
@@ -11,52 +11,45 @@
     </style>
 </head>
 <body>
-    <h1>Trova le gare per specialità</h1>
-    <input type="text" id="searchInput" placeholder="Es. 800m, salto in lungo..." onkeyup="filterGare()">
+    <h1>Trova le gare di atletica</h1>
+    <input type="text" id="searchInput" placeholder="Cerca per nome manifestazione..." onkeyup="filterGare()">
     <div id="results"></div>
 
     <script>
-        const gare = [
-            {
-                specialita: "800m",
-                luogo: "Torino",
-                data: "13 aprile 2025",
-                link: "https://www.fidal.it/risultati/2025/REG4567/Index.htm"
-            },
-            {
-                specialita: "Salto in lungo",
-                luogo: "Aosta",
-                data: "21 aprile 2025",
-                link: "https://www.fidal.it/risultati/2025/REG7890/Index.htm"
-            },
-            {
-                specialita: "100m",
-                luogo: "Milano",
-                data: "27 aprile 2025",
-                link: "https://www.fidal.it/risultati/2025/REG8910/Index.htm"
-            }
-        ];
+        let gare = [];
 
-        function filterGare() {
-            const input = document.getElementById("searchInput").value.toLowerCase();
-            const filtered = gare.filter(g => g.specialita.toLowerCase().includes(input));
+        // Carica il file JSON
+        fetch('manifestazioni_fidal.json')
+            .then(response => response.json())
+            .then(data => {
+                gare = data;
+                mostraGare(gare);
+            })
+            .catch(error => {
+                console.error('Errore nel caricamento dei dati:', error);
+            });
+
+        function mostraGare(lista) {
             const container = document.getElementById("results");
             container.innerHTML = "";
-
-            if (filtered.length === 0) {
+            if (lista.length === 0) {
                 container.innerHTML = "<p>Nessuna gara trovata.</p>";
                 return;
             }
 
-            filtered.forEach(g => {
+            lista.forEach(g => {
                 const div = document.createElement("div");
                 div.className = "gara";
-                div.innerHTML = `<strong>${g.specialita}</strong><br>Luogo: ${g.luogo}<br>Data: ${g.data}<br><a href="${g.link}" target="_blank">Vedi dispositivo tecnico</a>`;
+                div.innerHTML = `<strong>${g.nome}</strong><br><a href="${g.link}" target="_blank">Vai al dispositivo</a>`;
                 container.appendChild(div);
             });
         }
 
-        filterGare(); // Mostra tutte le gare inizialmente
+        function filterGare() {
+            const input = document.getElementById("searchInput").value.toLowerCase();
+            const filtered = gare.filter(g => g.nome.toLowerCase().includes(input));
+            mostraGare(filtered);
+        }
     </script>
 </body>
 </html>
