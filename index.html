@@ -8,6 +8,7 @@
         input { padding: 10px; width: 100%; margin-bottom: 20px; font-size: 16px; }
         .gara { background: white; padding: 15px; border-radius: 5px; margin-bottom: 10px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
         .gara a { color: #007BFF; text-decoration: none; }
+        em { color: #444; font-size: 0.9em; }
     </style>
 </head>
 <body>
@@ -26,11 +27,13 @@
             })
             .catch(error => {
                 console.error('Errore nel caricamento dei dati:', error);
+                document.getElementById("results").innerHTML = "<p>Errore nel caricamento dei dati.</p>";
             });
 
         function mostraGare(lista) {
             const container = document.getElementById("results");
             container.innerHTML = "";
+
             if (lista.length === 0) {
                 container.innerHTML = "<p>Nessuna gara trovata.</p>";
                 return;
@@ -49,7 +52,7 @@
             const input = document.getElementById("searchInput").value.toLowerCase();
             const filtered = gare.filter(g => {
                 const nomeMatch = g.nome.toLowerCase().includes(input);
-                const specialitaMatch = g.specialita && g.specialita.some(s => s.toLowerCase().includes(input));
+                const specialitaMatch = g.specialita && Array.isArray(g.specialita) && g.specialita.some(s => s.toLowerCase().includes(input));
                 return nomeMatch || specialitaMatch;
             });
             mostraGare(filtered);
