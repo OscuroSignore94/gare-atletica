@@ -12,14 +12,13 @@
 </head>
 <body>
     <h1>Trova le gare di atletica</h1>
-    <input type="text" id="searchInput" placeholder="Cerca per nome manifestazione..." onkeyup="filterGare()">
+    <input type="text" id="searchInput" placeholder="Cerca per nome o specialità..." onkeyup="filterGare()">
     <div id="results"></div>
 
     <script>
         let gare = [];
 
-        // Carica il file JSON
-        fetch('manifestazioni_fidal.json')
+        fetch('manifestazioni_fidal_con_specialita.json')
             .then(response => response.json())
             .then(data => {
                 gare = data;
@@ -40,14 +39,19 @@
             lista.forEach(g => {
                 const div = document.createElement("div");
                 div.className = "gara";
-                div.innerHTML = `<strong>${g.nome}</strong><br><a href="${g.link}" target="_blank">Vai al dispositivo</a>`;
+                const specialita = g.specialita && g.specialita.length ? `<br><em>Specialità: ${g.specialita.join(", ")}</em>` : "";
+                div.innerHTML = `<strong>${g.nome}</strong>${specialita}<br><a href="${g.link}" target="_blank">Vai al dispositivo</a>`;
                 container.appendChild(div);
             });
         }
 
         function filterGare() {
             const input = document.getElementById("searchInput").value.toLowerCase();
-            const filtered = gare.filter(g => g.nome.toLowerCase().includes(input));
+            const filtered = gare.filter(g => {
+                const nomeMatch = g.nome.toLowerCase().includes(input);
+                const specialitaMatch = g.specialita && g.specialita.some(s => s.toLowerCase().includes(input));
+                return nomeMatch || specialitaMatch;
+            });
             mostraGare(filtered);
         }
     </script>
